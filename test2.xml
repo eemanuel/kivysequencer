@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<data>
-   <items>
-      <audioitem effects="[]" filename="sounds/snare1.wav" pan="100" posX="20" posY="20" sizeH="32" sizeW="32" velocity="100" volume="100"/>
-      <audioitem effects="[]" filename="sounds/snare1.wav" pan="100" posX="20" posY="20" sizeH="32" sizeW="32" velocity="100" volume="100"/>
-      <audioitem effects="[]" filename="sounds/snare1.wav" pan="100" posX="20" posY="20" sizeH="32" sizeW="32" velocity="100" volume="100"/>
-   </items>
-</data>
