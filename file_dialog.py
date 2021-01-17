@@ -1,12 +1,10 @@
-# from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.factory import Factory
-from kivy.properties import ObjectProperty
-from kivy.uix.popup import Popup
-from file_save_loader import FileSystem
-
-from kivy.app import App
 import os
+
+from kivy.properties import ObjectProperty
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.popup import Popup
+
+from file_save_loader import FileSystem
 
 
 class LoadDialog(FloatLayout):
@@ -28,6 +26,7 @@ class FileLoader(FloatLayout):
 
     def __init__(self):
         self.filesystem = FileSystem()
+        self._popup = None
 
     def dismiss_popup(self):
         self._popup.dismiss()
@@ -44,10 +43,7 @@ class FileLoader(FloatLayout):
 
     def load(self, path, filename, audioitems, can):
         path = os.path.join(path, filename[0])
-        print("load from: ", path)
-        # App.get_running_app().root.sgr.canvas.clear()
         self.filesystem.read_project_file(audioitems, path, can)
-        # App.get_running_app().root.sgr.draw_grid(100,0,1000,1000,10)
         self.dismiss_popup()
 
     def save(self, path, filename, audioitems):
@@ -56,8 +52,3 @@ class FileLoader(FloatLayout):
         print("save audio items count: ", len(audioitems))
         self.filesystem.write_project_file(audioitems, path)
         self.dismiss_popup()
-
-
-Factory.register("Root", cls=FileLoader)
-Factory.register("LoadDialog", cls=LoadDialog)
-Factory.register("SaveDialog", cls=SaveDialog)

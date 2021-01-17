@@ -1,30 +1,27 @@
-from kivy.config import Config
+from functools import partial
+from random import randint
 
 from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.graphics import Color, Line, Rectangle
-
 from kivy.clock import Clock
-from functools import partial
-from kivy.graphics.instructions import InstructionGroup
-from kivy.utils import get_color_from_hex
+from kivy.config import Config
 from kivy.core.window import Window
-
-from random import randint
-from aengine_thread import AudioItem
-from helper_functions import Info, show_audio_items_stats
+from kivy.graphics import Color, Line, Rectangle
+from kivy.graphics.instructions import InstructionGroup
 from kivy.properties import NumericProperty
+from kivy.uix.widget import Widget
+from kivy.utils import get_color_from_hex
+
+import theme
+from aengine_thread import AudioItem
 
 stress_test = False
-import theme
-from kivy.uix.floatlayout import FloatLayout
 
 
 # disables red dots on right click
 Config.set("input", "mouse", "mouse,multitouch_on_demand")
 
 
-class Seq2(object):
+class Seq2:
     # for each tick check if audio item, check each audio item stats such as
     # velocity / note etc
     def __init__(self, ai):
@@ -66,18 +63,56 @@ class Seq2(object):
                 item.play()
 
 
-class Side_Panel(FloatLayout):
-    def __init__(self, **kwargs):
-        super(Side_Panel, self).__init__(**kwargs)
-
-    def on_touch_down(self, touch):
-        pass
-
-
-class Selection_Box(object):
+class Selection_Box:
     def __init__(self, x, y, w, h):
         self.start = [0, 0]
         self.r = Rectangle(pos=[x, y], size=[w, h])
+
+
+class LoopBars:
+    def __init__(self, width, height, canvas):
+        self.width = width
+        self.height = height
+        self.start = 0
+
+        self.canvas = canvas
+
+        self.loop = False
+        self.loops = InstructionGroup()
+
+    def loop_func(self, loop):
+        if loop:
+            loopL = Line(points=[30 + 20, self.height, 30 + 20, 0])
+            loopR = Line(points=[30 + 70, self.height, 30 + 70, 0])
+            handle_size = (20, 20)
+            top_padding = 20
+            loopHandleL = Rectangle(
+                pos=(loopL.points[0] - (handle_size[0] / 2), self.height - top_padding),
+                size=handle_size,
+            )
+            loopHandleR = Rectangle(
+                pos=(loopR.points[0] - (handle_size[0] / 2), self.height - top_padding),
+                size=handle_size,
+            )
+            self.loops.add(Color(0, 1, 1))
+            self.loops.add(loopL)
+            self.loops.add(Color(1, 0, 1))
+            self.loops.add(loopR)
+            self.loops.add(loopHandleL)
+            self.loops.add(loopHandleR)
+            self.canvas.add(self.loops)
+        else:
+            self.canvas.remove(self.loops)
+            self.loops.clear()
+
+    def drag_loop_bar(self, loop):
+        # only move loop line if dragged by handle
+        pass
+
+
+class Info:
+    x = 0
+    y = 0
 
 
 class PlayHead(Widget):
@@ -118,47 +153,6 @@ class PlayHead(Widget):
         p = [self.playhead_increment, self.height, self.playhead_increment, 0]
         self.ph.width = 2
         self.ph.points = p
-
-
-class LoopBars(object):
-    def __init__(self, width, height, canvas):
-        self.width = width
-        self.height = height
-        self.start = 0
-
-        self.canvas = canvas
-
-        self.loop = False
-        self.loops = InstructionGroup()
-
-    def loop_func(self, loop):
-        if loop:
-            loopL = Line(points=[30 + 20, self.height, 30 + 20, 0])
-            loopR = Line(points=[30 + 70, self.height, 30 + 70, 0])
-            handle_size = (20, 20)
-            top_padding = 20
-            loopHandleL = Rectangle(
-                pos=(loopL.points[0] - (handle_size[0] / 2), self.height - top_padding),
-                size=handle_size,
-            )
-            loopHandleR = Rectangle(
-                pos=(loopR.points[0] - (handle_size[0] / 2), self.height - top_padding),
-                size=handle_size,
-            )
-            self.loops.add(Color(0, 1, 1))
-            self.loops.add(loopL)
-            self.loops.add(Color(1, 0, 1))
-            self.loops.add(loopR)
-            self.loops.add(loopHandleL)
-            self.loops.add(loopHandleR)
-            self.canvas.add(self.loops)
-        else:
-            self.canvas.remove(self.loops)
-            self.loops.clear()
-
-    def drag_loop_bar(self, loop):
-        # only move loop line if dragged by handle
-        pass
 
 
 class GridLines(Widget):
@@ -401,7 +395,7 @@ class SeqGridWidget(Widget):
             self.old_shapes.append(item)
 
         # if ctrl is down
-        if self.sel_status == True:
+        if self.sel_status:
             # if rect not in canvas
             if self.sb.r not in self.canvas.children:
                 c = get_color_from_hex("#5745f722")
@@ -414,7 +408,7 @@ class SeqGridWidget(Widget):
         self.playhead.adjust_playhead(touch, self.grid)
 
         # if playhead is being moved, don't place a block/rect
-        if self.playhead.isPlayheadAdjust == False:
+        if not self.playhead.isPlayheadAdjust:
             for box in self.audio_items:
                 # delete item if right clicked on
                 self.delete_audio_item(touch, box, "right")
@@ -424,11 +418,7 @@ class SeqGridWidget(Widget):
                     self.selected_item = box
 
             # if not dragging and not right button, add new audio item
-            if (
-                self.drag == False
-                and touch.button != "right"
-                and self.sel_status == False
-            ):
+            if not self.drag and touch.button != "right" and not self.sel_status:
                 with self.canvas:
                     box_size = self.grid.space
                     app = App.get_running_app()
@@ -445,7 +435,6 @@ class SeqGridWidget(Widget):
                     self.check_snap_to_grid(ai, touch)
 
             # debugging info / stress test
-            show_audio_items_stats(self.audio_items)
             if stress_test:
                 self.paint_stress_test(self.width, self.height)
 
@@ -497,8 +486,6 @@ class SeqGridWidget(Widget):
         if args[1] == 305:
             print("ctrl")
             self.sel_status = False
-
-    space = 0
 
     def key_action_down(self, *args):
         # monitor keypresses
@@ -599,10 +586,6 @@ class SeqGridWidget(Widget):
                     self.canvas,
                 )
 
-    def draw_grid(self, amt, start, width, height, space):
-        # Rectangle(pos=[30,30], size=[400,400])
-        pass
-
     def paint_stress_test(self, width, height):
         # stress test with snapping blocks
         info = Info()
@@ -623,16 +606,3 @@ class SeqGridWidget(Widget):
                 # add to audio_item list
                 self.audio_items.append(ai)
                 self.check_snap_to_grid(ai, info)
-
-
-class SeqGridWidgetApp(App):
-    def build(self):
-        return SeqGridWidget()
-
-    def on_stop(self):
-        print("app was stopped here")
-        # write_project_file(self.audio_)
-
-
-if __name__ == "__main__":
-    SeqGridWidgetApp().run()

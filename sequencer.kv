@@ -1,24 +1,6 @@
 #:kivy 1.10.0
 #:import theme theme
 
-<Side_Panel>:
-  canvas.before:
-    Color:
-      rgba: 1,0,0,1
-    Rectangle:
-      size: self.size
-      pos: self.pos
-  rows: 5
-  cols: 5
-  size_hint_x: None
-  size_hint_y: None
-  size: 300, 11000
-  pos: -300, 0
-
-<Spacer@Label>:
-  size_hint_x:None
-  width: 10
-
 <TimingBar>:
   canvas.before:
     Color:
@@ -64,17 +46,6 @@
     id: step
     text:"0.0"
 
-<PlayheadControlBar>:
-  canvas.before:
-    Color:
-      # rgba: theme.playhead_control_bar
-    Rectangle:
-      size: self.size
-      pos: self.pos
-  size_hint_y: None
-  height: 30
-  # background_color: theme.playhead_control_bar
-
 <TransportButton@Button>:
   background_normal:''
   background_down:''
@@ -92,7 +63,7 @@
       pos: self.pos
   cols: 2
   text: "hello"
-  padding: 2 
+  padding: 2
   spacing: 2
   size_hint_x:.3
   Label:
@@ -108,7 +79,7 @@
     on_release:
       root.value += root.step
       root.value = min(root.value, root.max)
-      root.valchange(root.text, root.value)
+      root.change_value(root.text, root.value)
   TextInput:
     id: txt
     text: str(root.value)
@@ -162,8 +133,6 @@
       min: 1
       max: 8
       value: 5
-    # Spacer:
-    # TimingBar:
     TransportButton:
       text:"Open"
       on_press:root.button_open_project()
@@ -173,6 +142,7 @@
     TransportButton:
       text:"Options"
       on_press:root.button_options()
+    TransportButton:
       text:"Play"
       on_press:root.button_play()
     ToggleButton:
@@ -184,30 +154,6 @@
     TransportButton:
       text:"Stop"
       on_press:root.button_stop()
-    TransportButton:
-      text:"<<"
-      on_press:root.button_stop()
-    TransportButton:
-      text:"<"
-      on_press:root.button_stop()
-    TransportButton:
-      text:">"
-      on_press:root.button_stop()
-    TransportButton:
-      text:">>"
-      on_press:root.button_stop()
-    # Label:
-    #   text:"Bpm"
-    # TextInput:
-    #   background_color: .33,.33,.33,1
-    #   foreground_color: 1,1,1,1
-    #   input_filter: "int"
-    #   text:"120"
-    #   size_hint: (None, 1)
-    #   font_size: "24sp"
-    #   multiline: False
-    #   size:(50, 10)
-    #   on_text_validate: root.bpm_text(self)
     Button:
       size_hint_x: .3
       background_normal:''
@@ -260,17 +206,17 @@
     pos: root.pos
     orientation: "vertical"
     FileChooserListView:
-      id: filechooser
+      id: file_chooser
       rootpath: "./"
       BoxLayout:
         size_hint_y: None
-        height: 30
+        height: 50
+        Button:
+          text: "Load"
+          on_release: root.load(file_chooser.path, file_chooser.selection, app.root.seq_grid_widget.audio_items, app.root.seq_grid_widget.canvas)
         Button:
           text: "Cancel"
           on_release: root.cancel()
-        Button:
-          text: "Load"
-          on_release: root.load(filechooser.path, filechooser.selection, app.root.sgr.audio_items, app.root.sgr.canvas)
 
 <SaveDialog>:
   text_input: text_input
@@ -279,7 +225,7 @@
     pos: root.pos
     orientation: "vertical"
     FileChooserListView:
-      id: filechooser
+      id: file_chooser
       rootpath: "./"
       on_selection: text_input.text = self.selection and self.selection[0] or ''
     TextInput:
@@ -291,9 +237,8 @@
       size_hint_y: None
       height: 30
       Button:
+        text: "Save"
+        on_release: root.save(file_chooser.path, text_input.text, app.root.seq_grid_widget.audio_items)
+      Button:
         text: "Cancel"
         on_release: root.cancel()
-      Button:
-        text: "Save"
-        # on_release: app.root.file_system.write_project_file(app.root.sgr.audio_items, filechooser.path+text_input.text)
-        on_release: root.save(filechooser.path, text_input.text, app.root.sgr.audio_items)

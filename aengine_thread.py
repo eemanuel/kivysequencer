@@ -1,39 +1,10 @@
-from pyo import Metro, Server, SfPlayer, Sine, LFO, Delay, Biquadx
-from multiprocessing import Process
 import random
-from kivy.graphics import Color, Rectangle
-from kivy.uix.widget import Widget
 from random import uniform
 
+from kivy.graphics import Color, Rectangle
+from kivy.uix.widget import Widget
 
-class AudioEngine(Process):
-    def __init__(self, pitch=5):
-        super().__init__()
-        self.server = Server()
-        self.metro = None
-        self.sf_player = None
-
-        self.daemon = True
-        self.sr = 44100
-        self.num_channels = 2
-        self.buffer_size = 512
-        self.duplex = 0
-        self.pitch = pitch
-
-    def start(self):
-        self.server.deactivateMidi()
-        self.server.boot().start()
-        self.metro = Metro(0.0125)
-        self.metro.play()
-
-    def start_metro(self):
-        self.metro.play()
-
-    def stop_metro(self):
-        self.metro.stop()
-
-    def playsound(self, filename):
-        self.sf_player = SfPlayer(filename, mul=0.3).mix(2).out()
+from pyo import LFO, Biquadx, Delay, SfPlayer, Sine
 
 
 class AudioItem(Widget):
