@@ -1,5 +1,6 @@
 #:kivy 1.10.0
 #:import theme theme
+
 <Side_Panel>:
   canvas.before:
     Color:
@@ -13,9 +14,11 @@
   size_hint_y: None
   size: 300, 11000
   pos: -300, 0
+
 <Spacer@Label>:
   size_hint_x:None
   width: 10
+
 <TimingBar>:
   canvas.before:
     Color:
@@ -28,6 +31,7 @@
   spacing: 0
   padding:0
   size_hint_x: 1
+
   Label:
     text:"Min"
   Label:
@@ -40,6 +44,7 @@
     text:"Beat"
   Label:
     text:"Step"
+
   Label:
     id: min
     text:"000"
@@ -58,6 +63,7 @@
   Label:
     id: step
     text:"0.0"
+
 <PlayheadControlBar>:
   canvas.before:
     Color:
@@ -68,6 +74,7 @@
   size_hint_y: None
   height: 30
   # background_color: theme.playhead_control_bar
+
 <TransportButton@Button>:
   background_normal:''
   background_down:''
@@ -75,6 +82,7 @@
   color: theme.transport_buttons_text
   font_size:'18sp'
   size_hint_x: .3
+
 <NumericInput>:
   canvas.before:
     Color:
@@ -82,7 +90,6 @@
     Rectangle:
       size: self.size
       pos: self.pos
-  orientation: 'vertical'
   cols: 2
   text: "hello"
   padding: 2 
@@ -120,6 +127,7 @@
     on_release:
       root.value -= root.step
       root.value = max(root.value, root.min)
+
 <Transport>:
   canvas.before:
     Color:
@@ -206,6 +214,7 @@
       background_color: theme.about_button
       text:"About"
       on_press:root.button_about()
+
 <Row>:
   background_normal:''
   background_color: theme.left_file_browser_row
@@ -245,7 +254,6 @@
   padding: 20
   spacing: 20
 
-
 <LoadDialog>:
   BoxLayout:
     size: root.size
@@ -260,11 +268,9 @@
         Button:
           text: "Cancel"
           on_release: root.cancel()
-
         Button:
           text: "Load"
           on_release: root.load(filechooser.path, filechooser.selection, app.root.sgr.audio_items, app.root.sgr.canvas)
-
 
 <SaveDialog>:
   text_input: text_input
@@ -276,20 +282,17 @@
       id: filechooser
       rootpath: "./"
       on_selection: text_input.text = self.selection and self.selection[0] or ''
-
     TextInput:
       id: text_input
       size_hint_y: None
       height: 30
       multiline: False
-
     BoxLayout:
       size_hint_y: None
       height: 30
       Button:
         text: "Cancel"
         on_release: root.cancel()
-
       Button:
         text: "Save"
         # on_release: app.root.file_system.write_project_file(app.root.sgr.audio_items, filechooser.path+text_input.text)

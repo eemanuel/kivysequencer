@@ -47,7 +47,7 @@ class MyPaintWidget(Widget):
     def on_touch_down(self, touch):
         with self.canvas:
             Color(1, 0, 0)
-            d = 30.
+            d = 30.0
             # SHOW WHERE MOUSE CLICK IS
             Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
 
@@ -60,8 +60,11 @@ class MyPaintWidget(Widget):
         for x in range(0, len(t1_vals)):
             waveform_height = 12.0
             zoom = 0.55  # 0.1 is taller peaks, 0.9 is squashed
-            y = math.sin(t1_vals[x] * math.pi /
-                         (zoom * 180)) * amplitude * waveform_height
+            y = (
+                math.sin(t1_vals[x] * math.pi / (zoom * 180))
+                * amplitude
+                * waveform_height
+            )
             points.append(x + self.w_width)
             points.append(y + self.w_height)
 
@@ -69,13 +72,18 @@ class MyPaintWidget(Widget):
 
         with self.canvas:
             # DRAW RECT
-            Color(.3, .3, .3)
+            Color(0.3, 0.3, 0.3)
             b = Rectangle(
-                pos=(self.w_width - self.rect_size_x / 2,
-                     self.w_height - self.rect_size_y / 2),
-                size=(self.rect_size_x + self.w_width,
-                      self.rect_size_y + self.w_height))
-            #DRAW WAVEFORM
+                pos=(
+                    self.w_width - self.rect_size_x / 2,
+                    self.w_height - self.rect_size_y / 2,
+                ),
+                size=(
+                    self.rect_size_x + self.w_width,
+                    self.rect_size_y + self.w_height,
+                ),
+            )
+            # DRAW WAVEFORM
             c = get_color_from_hex("#AA8CC5")
             Color(*c)
             Line(points=points)
@@ -91,5 +99,5 @@ class MyPaintApp(App):
         # return MyPaintWidget()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     MyPaintApp().run()

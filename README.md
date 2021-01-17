@@ -5,6 +5,14 @@
 
 ![](screenshot.png)
 
+
+
+## TO INSTALL KIVY IN VENV
+
+pip3 install cython
+pip3 install kivy
+
+
 ## Installation
 
 Requires:
